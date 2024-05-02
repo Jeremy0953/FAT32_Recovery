@@ -268,6 +268,12 @@ void RecoverContiguousFile(char *filename, char *expectedSha1) {
     int count = 0;
     DirEntry **deleteds = (DirEntry **)malloc(MAX_EQUAL_NAME * sizeof(DirEntry *));
     FindDeletedFile(filename, &count, deleteds);
+    // for(int i = 0; i< count; i++) {
+    //     printf("size of DIRENTRY: %d\n", sizeof(DirEntry));
+    //     printf("DIR_ADDR: %x\n", deleteds[i]);
+    //     printf("DIR_Name: %s\n", deleteds[i]->DIR_Name);
+    //     printf("DIR_FileSize: %d\n", deleteds[i]->DIR_FileSize);
+    // }
     if (count == 0) {
         printf("%s: file not found\n", filename);
         free(deleteds);
@@ -281,7 +287,7 @@ void RecoverContiguousFile(char *filename, char *expectedSha1) {
     bool success = false;
     for (int i = 0; i < count; i++)
     {
-        DirEntry *deleted = deleteds[0];
+        DirEntry *deleted = deleteds[i];
         int startCluster = (deleted->DIR_FstClusHI << 16) | deleted->DIR_FstClusLO;
         int fileSize = deleted->DIR_FileSize;
         int bytesPerCluster = boot->BPB_SecPerClus * boot->BPB_BytsPerSec;
@@ -326,6 +332,7 @@ void RecoverContiguousFile(char *filename, char *expectedSha1) {
             }
             // printf("Actual SHA-1: %s\n", actualSha1);
             // printf("Expected SHA-1: %s\n", expectedSha1);
+            // printf("file content: %s\n", fileData);
             if (strcmp(actualSha1, expectedSha1) != 0) {
                 free(fileData);
                 continue;

@@ -491,7 +491,7 @@ int main(int argc, char* argv[]){
         }
     if (R_flag)
         RecoverNonContiguousFile(filename);
-
+    msync(mapped_addr, sb.st_size, MS_ASYNC);
     munmap(mapped_addr, sb.st_size);
     close(fd);
     free(FATS);

@@ -1,0 +1,5 @@
+*.zip
+disk*
+*.tar.xz
+nyufile-autograder/
+nyufile

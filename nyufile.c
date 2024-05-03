@@ -61,7 +61,7 @@ typedef struct DirEntry {
 #pragma pack(pop)
 
 #define SHA_DIGEST_LENGTH 20
-#define MAX_EQUAL_NAME 20
+#define MAX_EQUAL_NAME 300
 typedef unsigned int* FAT32;
 
 // global variables
@@ -267,6 +267,10 @@ void setFATEntry(int *fat, int cluster, int value) {
 void RecoverContiguousFile(char *filename, char *expectedSha1) {
     int count = 0;
     DirEntry **deleteds = (DirEntry **)malloc(MAX_EQUAL_NAME * sizeof(DirEntry *));
+    if (deleteds == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return;  // 或者采用其他错误处理方式
+    }
     FindDeletedFile(filename, &count, deleteds);
     // for(int i = 0; i< count; i++) {
     //     printf("size of DIRENTRY: %d\n", sizeof(DirEntry));
@@ -350,7 +354,6 @@ void RecoverContiguousFile(char *filename, char *expectedSha1) {
         fwrite(fileData, 1, fileSize, recoveredFile);
         fclose(recoveredFile);
         free(fileData);
-        free(deleteds);
         if (deleted->DIR_Name[0] == 0xE5) {
             deleted->DIR_Name[0] = filename[0];  
         }
@@ -360,6 +363,7 @@ void RecoverContiguousFile(char *filename, char *expectedSha1) {
         printf("%s: file not found\n", filename);
         free(deleteds);
     }
+    //free(deleteds);
 }
 
 void RecoverNonContiguousFile(char *filename){
@@ -482,7 +486,7 @@ int main(int argc, char* argv[]){
     unsigned int root_dir_byte = data_region_start_byte + (boot->BPB_RootClus - 2) * boot->BPB_SecPerClus * boot->BPB_BytsPerSec;
     //global variable
     root_dir = mapped_addr + root_dir_byte;
-
+    //printf("root byte: %x\n", root_dir_byte);
     
 
     // Process the options
